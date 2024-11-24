@@ -1,6 +1,6 @@
 Here's a concise but complete README.md for your project:
 
-```markdown:README.md
+
 # Markdown Equations Fixer
 
 A command-line tool that converts LaTeX-style mathematical equations (`\[...\]`) to proper markdown format (`$$...$$`) in your markdown files.

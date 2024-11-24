@@ -1,14 +1,33 @@
-Here's a concise but complete README.md for your project:
-
-
 # Markdown Equations Fixer
+
+[![PyPI version](https://badge.fury.io/py/markdown-equations-fixer.svg)](https://badge.fury.io/py/markdown-equations-fixer)
+[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A command-line tool that converts LaTeX-style mathematical equations (`\[...\]`) to proper markdown format (`$$...$$`) in your markdown files.
 
+## Quick Start
+
+```bash
+# Install from PyPI
+pip install markdown-equations-fixer
+
+# Basic usage
+meq-fixer fix document.md
+```
+
 ## Installation
+
+You can install the package directly from PyPI:
 
 ```bash
 pip install markdown-equations-fixer
+```
+
+Or install the latest development version from GitHub:
+
+```bash
+pip install git+https://github.com/vs15vivek/markdown-equations-fixer.git
 ```
 
 ## Usage

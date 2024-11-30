@@ -60,11 +60,57 @@ Preview changes:
 meq-fixer fix --dry-run thesis.md
 ```
 
+### Format Conversion
+
+Convert between different document formats:
+```bash
+# Basic conversion (markdown to GitHub-Flavored Markdown)
+meq-fixer convert input.md output.md
+
+# Convert markdown to DOCX (two approaches)
+# Method 1: Fix equations first, then convert
+meq-fixer fix document.md
+meq-fixer convert document.md output.docx --from-format markdown --to-format docx
+
+# Method 2: Fix and convert in one step
+meq-fixer convert document.md output.docx --from-format markdown --to-format docx --fix-equations
+
+# Convert from LaTeX to DOCX
+meq-fixer convert paper.tex paper.docx --from-format latex --to-format docx
+
+# Convert and fix equations in one go
+meq-fixer convert --fix-equations paper.tex paper.md
+```
+
+Supported formats:
+- markdown
+- gfm (GitHub-Flavored Markdown)
+- commonmark
+- latex
+- org
+- docx
+- pdf
+
+### Requirements for DOCX/PDF Conversion
+
+To ensure proper equation rendering in DOCX and PDF files, you need:
+
+1. Pandoc installed on your system:
+   - Windows: `choco install pandoc`
+   - macOS: `brew install pandoc`
+   - Linux: `sudo apt-get install pandoc`
+
+2. A LaTeX distribution:
+   - Windows: `choco install miktex`
+   - macOS: `brew install basictex`
+   - Linux: `sudo apt-get install texlive-latex-extra`
+
 ## Features
 
 - Converts `\[...\]` to `$$...$$` format
 - Handles single-line and multi-line equations
 - Supports recursive directory processing
+- Document format conversion using pandoc (including DOCX and PDF)
 - Dry-run mode for safe testing
 - Rich console output with progress tracking
 
@@ -73,6 +119,9 @@ meq-fixer fix --dry-run thesis.md
 - Python 3.7+
 - click>=8.0.0
 - rich>=10.0.0
+- pypandoc>=1.11
+- pandoc (system requirement)
+- LaTeX distribution (for equation rendering in DOCX/PDF)
 
 ## License
 

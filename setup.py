@@ -21,7 +21,7 @@ setup(
     description="A CLI tool to fix mathematical equations in markdown files and convert between formats",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/vs15vivek/markdown-equations-fixer",
+    url="https://github.com/dynstat/markdown-equations-fixer",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

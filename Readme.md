@@ -27,7 +27,7 @@ pip install markdown-equations-fixer
 Or install the latest development version from GitHub:
 
 ```bash
-pip install git+https://github.com/vs15vivek/markdown-equations-fixer.git
+pip install git+https://github.com/dynstat/markdown-equations-fixer.git
 ```
 
 ## Usage
@@ -80,5 +80,5 @@ MIT License - See [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
-Issues and pull requests are welcome on [GitHub](https://github.com/vs15vivek/markdown-equation-fixer).
+Issues and pull requests are welcome on [GitHub](https://github.com/dynstat/markdown-equations-fixer/).
 ```

@@ -69,11 +69,11 @@ meq-fixer convert input.md output.md
 
 # Convert markdown to DOCX (two approaches)
 # Method 1: Fix equations first, then convert
-meq-fixer fix document.md
-meq-fixer convert document.md output.docx --from-format markdown --to-format docx
+meq-fixer fix test_equations.md
+meq-fixer convert test_equations.md output.docx --from-format markdown --to-format docx
 
 # Method 2: Fix and convert in one step
-meq-fixer convert document.md output.docx --from-format markdown --to-format docx --fix-equations
+meq-fixer convert test_equations.md output.docx --from-format markdown --to-format docx --fix-equations
 
 # Convert from LaTeX to DOCX
 meq-fixer convert paper.tex paper.docx --from-format latex --to-format docx

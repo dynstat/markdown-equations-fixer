@@ -248,7 +248,7 @@ def convert(
 @cli.command()
 def version():
     """Show the version information."""
-    click.echo("Markdown Equation Fixer v1.1.0")
+    click.echo("Markdown Equation Fixer v1.1.2")
 
 
 if __name__ == "__main__":

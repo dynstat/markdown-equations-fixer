@@ -5,18 +5,19 @@ import re
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich import print as rprint
-from typing import Optional, List
+from typing import Optional, List, Literal
 import logging
+import pypandoc
 
 # Set up logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Initialize rich console
 console = Console()
+
 
 class EquationFixer:
     def __init__(self, dry_run: bool = False, verbose: bool = False):
@@ -30,27 +31,29 @@ class EquationFixer:
         """Fix mathematical equations in markdown content."""
         try:
             # Pattern to match equations that start with \[ and end with \]
-            equation_pattern = r'\\\[(.*?)\\\]'
-            
+            equation_pattern = r"\\\[(.*?)\\\]"
+
             # Function to replace matches with properly formatted equations
             def replace_equation(match):
                 equation = match.group(1).strip()
-                return f'$$\n{equation}\n$$'
-            
+                return f"$$\n{equation}\n$$"
+
             # Replace \[ ... \] equations
-            content = re.sub(equation_pattern, replace_equation, content, flags=re.DOTALL)
-            
+            content = re.sub(
+                equation_pattern, replace_equation, content, flags=re.DOTALL
+            )
+
             # Pattern to match single-line equations with single \[ and \]
-            single_line_pattern = r'\\(\[|\])'
-            content = re.sub(single_line_pattern, '$$', content)
-            
+            single_line_pattern = r"\\(\[|\])"
+            content = re.sub(single_line_pattern, "$$", content)
+
             # Fix cases where multiple $$ appear consecutively
-            content = re.sub(r'\${2,}', '$$', content)
-            
+            content = re.sub(r"\${2,}", "$$", content)
+
             # Ensure proper spacing around equation blocks
-            content = re.sub(r'(\$\$)\s*(\S)', r'\1\n\2', content)
-            content = re.sub(r'(\S)\s*(\$\$)', r'\1\n\2', content)
-            
+            content = re.sub(r"(\$\$)\s*(\S)", r"\1\n\2", content)
+            content = re.sub(r"(\S)\s*(\$\$)", r"\1\n\2", content)
+
             return content
         except Exception as e:
             logger.error(f"Error fixing equations: {str(e)}")
@@ -62,14 +65,14 @@ class EquationFixer:
             if self.verbose:
                 logger.info(f"Processing {file_path}")
 
-            with open(file_path, 'r', encoding='utf-8') as file:
+            with open(file_path, "r", encoding="utf-8") as file:
                 content = file.read()
 
             modified_content = self.fix_equations(content)
-            
+
             if content != modified_content:
                 if not self.dry_run:
-                    with open(file_path, 'w', encoding='utf-8') as file:
+                    with open(file_path, "w", encoding="utf-8") as file:
                         file.write(modified_content)
                 self.files_modified += 1
                 rprint(f"[green]✓[/green] Modified: {file_path}")
@@ -85,56 +88,58 @@ class EquationFixer:
             rprint(f"[red]✗[/red] Error processing {file_path}: {str(e)}")
             return False
 
+
 def validate_paths(paths: List[Path]) -> List[Path]:
     """Validate and collect markdown files from given paths."""
     valid_files = []
     for path in paths:
-        if path.is_file() and path.suffix.lower() in ['.md', '.markdown']:
+        if path.is_file() and path.suffix.lower() in [".md", ".markdown"]:
             valid_files.append(path)
         elif path.is_dir():
-            valid_files.extend(
-                p for p in path.rglob('*.md') if p.is_file()
-            )
-            valid_files.extend(
-                p for p in path.rglob('*.markdown') if p.is_file()
-            )
+            valid_files.extend(p for p in path.rglob("*.md") if p.is_file())
+            valid_files.extend(p for p in path.rglob("*.markdown") if p.is_file())
     return valid_files
 
+
 @click.group()
-@click.version_option(version='1.0.0')
+@click.version_option(version="1.0.0")
 def cli():
     """Markdown Equation Fixer - Fix mathematical equations in markdown files."""
     pass
 
+
 @cli.command()
-@click.argument('paths', type=click.Path(exists=True), nargs=-1, required=True)
-@click.option('--dry-run', is_flag=True, help="Show what would be done without making changes.")
-@click.option('--verbose', '-v', is_flag=True, help="Enable verbose output.")
-@click.option('--recursive', '-r', is_flag=True, help="Process directories recursively.")
+@click.argument("paths", type=click.Path(exists=True), nargs=-1, required=True)
+@click.option(
+    "--dry-run", is_flag=True, help="Show what would be done without making changes."
+)
+@click.option("--verbose", "-v", is_flag=True, help="Enable verbose output.")
+@click.option(
+    "--recursive", "-r", is_flag=True, help="Process directories recursively."
+)
 def fix(paths: tuple, dry_run: bool, verbose: bool, recursive: bool):
     """Fix equations in markdown files."""
     try:
         fixer = EquationFixer(dry_run=dry_run, verbose=verbose)
-        
+
         # Convert paths to Path objects
         path_objects = [Path(p) for p in paths]
-        
+
         # Collect all valid markdown files
         markdown_files = validate_paths(path_objects)
-        
+
         if not markdown_files:
-            rprint("[yellow]Warning:[/yellow] No markdown files found in specified paths.")
+            rprint(
+                "[yellow]Warning:[/yellow] No markdown files found in specified paths."
+            )
             sys.exit(1)
 
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
-            console=console
+            console=console,
         ) as progress:
-            task = progress.add_task(
-                "Processing files...", 
-                total=len(markdown_files)
-            )
+            task = progress.add_task("Processing files...", total=len(markdown_files))
 
             for file_path in markdown_files:
                 fixer.process_file(file_path)
@@ -148,16 +153,103 @@ def fix(paths: tuple, dry_run: bool, verbose: bool, recursive: bool):
             console.print(f"[red]Errors encountered: {fixer.errors}[/red]")
 
         if dry_run:
-            console.print("\n[yellow]Note: This was a dry run. No files were modified.[/yellow]")
+            console.print(
+                "\n[yellow]Note: This was a dry run. No files were modified.[/yellow]"
+            )
 
     except Exception as e:
         logger.error(f"Error during execution: {str(e)}")
         sys.exit(1)
 
+
+@cli.command()
+@click.argument("input_file", type=click.Path(exists=True))
+@click.argument("output_file", type=click.Path())
+@click.option(
+    "--from-format",
+    "-f",
+    "from_fmt",
+    type=click.Choice(["markdown", "gfm", "commonmark", "latex", "org", "docx"]),
+    default="markdown",
+    help="Input format (default: markdown)",
+)
+@click.option(
+    "--to-format",
+    "-t",
+    "to_fmt",
+    type=click.Choice(["markdown", "gfm", "commonmark", "latex", "org", "docx", "pdf"]),
+    default="gfm",
+    help="Output format (default: gfm)",
+)
+@click.option("--fix-equations", is_flag=True, help="Fix equations after conversion")
+def convert(
+    input_file: str, output_file: str, from_fmt: str, to_fmt: str, fix_equations: bool
+):
+    """Convert between different document formats while preserving equations.
+
+    Supported formats: markdown, gfm (GitHub-Flavored Markdown),
+    commonmark, latex, org, docx, pdf
+    """
+    try:
+        # Check if pandoc is installed
+        if not pypandoc.get_pandoc_version():
+            rprint(
+                "[red]Error:[/red] Pandoc is not installed. Please install pandoc first."
+            )
+            sys.exit(1)
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console,
+        ) as progress:
+
+            progress.add_task("Converting document...", total=None)
+
+            # Add extra arguments for better PDF/DOCX output
+            extra_args = ["--wrap=none"]
+
+            # Add specific arguments for PDF/DOCX output
+            if to_fmt in ["pdf", "docx"]:
+                extra_args.extend(
+                    [
+                        "--standalone",
+                        "--variable",
+                        "geometry:margin=1in",
+                        "--variable",
+                        "mainfont:Times New Roman",
+                    ]
+                )
+
+            # Convert the document
+            output = pypandoc.convert_file(
+                input_file,
+                to=to_fmt,
+                format=from_fmt,
+                outputfile=output_file,
+                extra_args=extra_args,
+            )
+
+            if fix_equations and to_fmt in ["markdown", "gfm", "commonmark"]:
+                # Fix equations in the converted file (only for markdown formats)
+                fixer = EquationFixer(dry_run=False, verbose=False)
+                fixer.process_file(Path(output_file))
+
+            rprint(
+                f"[green]✓[/green] Successfully converted {input_file} to {output_file}"
+            )
+
+    except Exception as e:
+        rprint(f"[red]Error:[/red] Conversion failed: {str(e)}")
+        logger.error(f"Conversion error: {str(e)}")
+        sys.exit(1)
+
+
 @cli.command()
 def version():
     """Show the version information."""
-    click.echo("Markdown Equation Fixer v1.0.0")
+    click.echo("Markdown Equation Fixer v1.1.0")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     cli()

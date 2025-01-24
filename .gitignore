@@ -3,3 +3,5 @@
 dist/
 build/
 __pycache__/
+update-pypi.md
+.env

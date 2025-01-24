@@ -65,27 +65,29 @@ class EquationFixer:
             if self.verbose:
                 logger.info(f"Processing {file_path}")
 
-            with open(file_path, "r", encoding="utf-8") as file:
+            # Updated file handling with explicit newline handling
+            with open(file_path, "r", encoding="utf-8", newline=None) as file:
                 content = file.read()
 
             modified_content = self.fix_equations(content)
 
             if content != modified_content:
                 if not self.dry_run:
-                    with open(file_path, "w", encoding="utf-8") as file:
+                    # Use universal newlines for writing
+                    with open(file_path, "w", encoding="utf-8", newline="\n") as file:
                         file.write(modified_content)
                 self.files_modified += 1
-                rprint(f"[green]✓[/green] Modified: {file_path}")
+                rprint(f"[green]✓[/green] Modified: {str(file_path)}")
             else:
                 if self.verbose:
-                    rprint(f"[blue]ℹ[/blue] No changes needed: {file_path}")
+                    rprint(f"[blue]ℹ[/blue] No changes needed: {str(file_path)}")
 
             self.files_processed += 1
             return True
 
         except Exception as e:
             self.errors += 1
-            rprint(f"[red]✗[/red] Error processing {file_path}: {str(e)}")
+            rprint(f"[red]✗[/red] Error processing {str(file_path)}: {str(e)}")
             return False
 
 
@@ -94,11 +96,13 @@ def validate_paths(paths: List[Path]) -> List[Path]:
     valid_files = []
     for path in paths:
         if path.is_file() and path.suffix.lower() in [".md", ".markdown"]:
-            valid_files.append(path)
+            valid_files.append(path.resolve())  # Use resolve() for absolute paths
         elif path.is_dir():
-            valid_files.extend(p for p in path.rglob("*.md") if p.is_file())
-            valid_files.extend(p for p in path.rglob("*.markdown") if p.is_file())
-    return valid_files
+            valid_files.extend(p.resolve() for p in path.rglob("*.md") if p.is_file())
+            valid_files.extend(
+                p.resolve() for p in path.rglob("*.markdown") if p.is_file()
+            )
+    return sorted(set(valid_files))  # Remove duplicates and sort
 
 
 @click.group()

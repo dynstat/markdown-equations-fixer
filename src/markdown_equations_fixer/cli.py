@@ -9,6 +9,9 @@ from typing import Optional, List, Literal
 import logging
 import pypandoc
 
+__version__ = "1.1.2"
+
+
 # Set up logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -30,29 +33,28 @@ class EquationFixer:
     def fix_equations(self, content: str) -> str:
         """Fix mathematical equations in markdown content."""
         try:
-            # Pattern to match equations that start with \[ and end with \]
-            equation_pattern = r"\\\[(.*?)\\\]"
-
-            # Function to replace matches with properly formatted equations
-            def replace_equation(match):
-                equation = match.group(1).strip()
-                return f"$$\n{equation}\n$$"
-
-            # Replace \[ ... \] equations
+            # Pattern to match block equations: \[ ... \]
+            # The re.DOTALL flag allows the match to span multiple lines.
             content = re.sub(
-                equation_pattern, replace_equation, content, flags=re.DOTALL
+                r"\\\[\s*(.*?)\s*\\\]",
+                r"$$\n\1\n$$",
+                content,
+                flags=re.DOTALL,
             )
 
-            # Pattern to match single-line equations with single \[ and \]
-            single_line_pattern = r"\\(\[|\])"
-            content = re.sub(single_line_pattern, "$$", content)
+            # Pattern to match inline equations: \( ... \) -> $ ... $
+            content = re.sub(r"\\\((.*?)\\\)", r"$\1$", content)
 
-            # Fix cases where multiple $$ appear consecutively
+            # This pattern is aggressive and may have unintended consequences.
+            # It's intended to fix single-line equations like \[eq\] to $$eq$$.
+            content = re.sub(r"\\(\[|\])", "$$", content)
+
+            # Collapse consecutive dollar signs into a single pair. e.g., $$$$ -> $$
             content = re.sub(r"\${2,}", "$$", content)
 
-            # Ensure proper spacing around equation blocks
-            content = re.sub(r"(\$\$)\s*(\S)", r"\1\n\2", content)
+            # Ensure proper newlines around block equations for better rendering.
             content = re.sub(r"(\S)\s*(\$\$)", r"\1\n\2", content)
+            content = re.sub(r"(\$\$)\s*(\S)", r"\1\n\2", content)
 
             return content
         except Exception as e:
@@ -91,22 +93,24 @@ class EquationFixer:
             return False
 
 
-def validate_paths(paths: List[Path]) -> List[Path]:
+def validate_paths(paths: List[Path], recursive: bool) -> List[Path]:
     """Validate and collect markdown files from given paths."""
     valid_files = []
+    patterns = ["*.md", "*.markdown"]
     for path in paths:
         if path.is_file() and path.suffix.lower() in [".md", ".markdown"]:
-            valid_files.append(path.resolve())  # Use resolve() for absolute paths
+            valid_files.append(path.resolve())
         elif path.is_dir():
-            valid_files.extend(p.resolve() for p in path.rglob("*.md") if p.is_file())
-            valid_files.extend(
-                p.resolve() for p in path.rglob("*.markdown") if p.is_file()
-            )
-    return sorted(set(valid_files))  # Remove duplicates and sort
+            for pattern in patterns:
+                glob_method = path.rglob if recursive else path.glob
+                valid_files.extend(
+                    p.resolve() for p in glob_method(pattern) if p.is_file()
+                )
+    return sorted(list(set(valid_files)))
 
 
 @click.group()
-@click.version_option(version="1.0.0")
+@click.version_option(version=__version__)
 def cli():
     """Markdown Equation Fixer - Fix mathematical equations in markdown files."""
     pass
@@ -130,7 +134,7 @@ def fix(paths: tuple, dry_run: bool, verbose: bool, recursive: bool):
         path_objects = [Path(p) for p in paths]
 
         # Collect all valid markdown files
-        markdown_files = validate_paths(path_objects)
+        markdown_files = validate_paths(path_objects, recursive=recursive)
 
         if not markdown_files:
             rprint(
@@ -247,12 +251,6 @@ def convert(
         rprint(f"[red]Error:[/red] Conversion failed: {str(e)}")
         logger.error(f"Conversion error: {str(e)}")
         sys.exit(1)
-
-
-@cli.command()
-def version():
-    """Show the version information."""
-    click.echo("Markdown Equation Fixer v1.1.2")
 
 
 if __name__ == "__main__":

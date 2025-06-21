@@ -9,7 +9,7 @@ from typing import Optional, List, Literal
 import logging
 import pypandoc
 
-__version__ = "1.1.2"
+from . import __version__
 
 
 # Set up logging

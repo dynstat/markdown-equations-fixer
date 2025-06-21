@@ -1,5 +1,6 @@
 # setup.py
 import os
+import re
 from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -10,7 +11,12 @@ with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
 
 # Get the version from the __init__.py file
 with open(os.path.join(here, "src/markdown_equations_fixer/__init__.py")) as f:
-    version = f.read().split("'")[1]
+    version_file = f.read()
+version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
+if version_match:
+    version = version_match.group(1)
+else:
+    raise RuntimeError("Unable to find version string.")
 
 setup(
     name="markdown-equations-fixer",

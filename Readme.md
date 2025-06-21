@@ -105,7 +105,7 @@ meq-fixer convert [OPTIONS] <INPUT_FILE> <OUTPUT_FILE>
 
 1.  **Convert Markdown to a DOCX document:**
     ```bash
-    meq-fixer convert my-paper.md my-paper.docx
+    meq-fixer convert my-paper.md my-paper.docx --to-format docx
     ```
 
 2.  **Convert a LaTeX file to GitHub-Flavored Markdown (GFM):**

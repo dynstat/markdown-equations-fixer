@@ -5,8 +5,8 @@ from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-# Get the long description from the README file
-with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
+# Get the long description from the README file (match actual filename)
+with open(os.path.join(here, "Readme.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 # Get the version from the __init__.py file

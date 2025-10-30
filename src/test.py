@@ -42,6 +42,13 @@ def test_fix_inline_equations(fixer):
     )
 
 
+def test_fix_bracket_line_block(fixer):
+    """Test fixing blocks where [ and ] are on their own lines."""
+    input_text = "[\nE=mc^2\n]"
+    expected = "$$\nE=mc^2\n$$"
+    assert fixer.fix_equations(input_text) == expected
+
+
 def test_validate_paths_recursive(temp_dir):
     """Test recursive path validation."""
     paths = [temp_dir]

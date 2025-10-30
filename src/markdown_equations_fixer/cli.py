@@ -33,6 +33,21 @@ class EquationFixer:
     def fix_equations(self, content: str) -> str:
         """Fix mathematical equations in markdown content."""
         try:
+            # Pattern to match block equations delimited by standalone lines with [ and ]
+            # Example:
+            # [\n
+            # equation content\n
+            # ]
+            # This converts to:
+            # $$\n
+            # equation content\n
+            # $$
+            content = re.sub(
+                r"(?ms)^\[\s*$\n(.*?)\n^\]\s*$",
+                r"$$\n\1\n$$",
+                content,
+            )
+
             # Pattern to match block equations: \[ ... \]
             # The re.DOTALL flag allows the match to span multiple lines.
             content = re.sub(

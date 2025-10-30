@@ -34,19 +34,26 @@ class EquationFixer:
         """Fix mathematical equations in markdown content."""
         try:
             # Pattern to match block equations delimited by standalone lines with [ and ]
-            # Example:
-            # [\n
-            # equation content\n
-            # ]
-            # This converts to:
-            # $$\n
-            # equation content\n
-            # $$
-            content = re.sub(
-                r"(?ms)^\[\s*$\n(.*?)\n^\]\s*$",
-                r"$$\n\1\n$$",
-                content,
+            # Allow optional blank/whitespace-only lines after [ and before ]
+            # and preserve inner content trimmed of leading/trailing blank lines.
+            bracket_block_pattern = re.compile(
+                r"(?ms)^[\t ]*\[[\t ]*\r?\n(.*?)(?:\r?\n)^[\t ]*\][\t ]*(?:\r?\n|$)",
             )
+
+            def _replace_bracket_block(match: re.Match) -> str:
+                inner = match.group(1)
+                # Trim leading/trailing blank lines in the captured block
+                lines = inner.splitlines()
+                start = 0
+                end = len(lines)
+                while start < end and lines[start].strip() == "":
+                    start += 1
+                while end > start and lines[end - 1].strip() == "":
+                    end -= 1
+                inner_trimmed = "\n".join(lines[start:end])
+                return f"$$\n{inner_trimmed}\n$$\n"
+
+            content = bracket_block_pattern.sub(_replace_bracket_block, content)
 
             # Pattern to match block equations: \[ ... \]
             # The re.DOTALL flag allows the match to span multiple lines.

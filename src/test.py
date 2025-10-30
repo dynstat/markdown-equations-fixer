@@ -49,6 +49,23 @@ def test_fix_bracket_line_block(fixer):
     assert fixer.fix_equations(input_text) == expected
 
 
+def test_fix_bracket_block_with_blank_lines_and_indent(fixer):
+    """Blocks with extra blank lines and indentation should be converted."""
+    input_text = (
+        "\n[\n\n   Z₁ = XW₁ + b₁\n\n]\n\n"  # first block
+        "[\n   A₁ = ReLU(Z₁)\n]\n\n"      # second block
+        "[\n   Z₂ = A₁W₂ + b₂\n]\n\n"      # third block
+        "[\n   \\hat{y} = Z₂\n]\n\n"       # fourth block
+        "[\n   L = \\frac{1}{2m} \\sum (y - \\hat{y})^2\n]\n"  # fifth block
+    )
+    output = fixer.fix_equations(input_text)
+    # Ensure each becomes a $$ block and inner content preserved sans surrounding blanks
+    assert "$$\nZ₁ = XW₁ + b₁\n$$" in output
+    assert "$$\nA₁ = ReLU(Z₁)\n$$" in output
+    assert "$$\nZ₂ = A₁W₂ + b₂\n$$" in output
+    assert "$$\n\\hat{y} = Z₂\n$$" in output
+    assert "$$\nL = \\frac{1}{2m} \\sum (y - \\hat{y})^2\n$$" in output
+
 def test_validate_paths_recursive(temp_dir):
     """Test recursive path validation."""
     paths = [temp_dir]

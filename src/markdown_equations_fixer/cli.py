@@ -1,13 +1,13 @@
-import click
-import sys
-from pathlib import Path
-import re
-from rich.console import Console
-from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich import print as rprint
-from typing import Optional, List, Literal
-import logging
-import pypandoc
+import click  # CLI creation and argument parsing
+import sys  # System-specific parameters and functions (e.g., exit)
+from pathlib import Path  # Filesystem path operations (cross-platform)
+import re  # Regular expressions for text processing
+from rich.console import Console  # Rich text console output
+from rich.progress import Progress, SpinnerColumn, TextColumn  # Progress bar components
+from rich import print as rprint  # Rich-formatted print function
+from typing import Optional, List, Literal  # Type hinting utilities
+import logging  # Logging module for status and error reporting
+import pypandoc  # Pandoc wrapper for document format conversion
 
 from . import __version__
 

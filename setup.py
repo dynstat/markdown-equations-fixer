@@ -5,9 +5,18 @@ from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-# Get the long description from the README file (match actual filename)
-with open(os.path.join(here, "Readme.md"), encoding="utf-8") as f:
-    long_description = f.read()
+# Get the long description from the README file (try common filename variations)
+readme_files = ["Readme.md", "README.md", "readme.md"]
+long_description = ""
+for readme_file in readme_files:
+    readme_path = os.path.join(here, readme_file)
+    if os.path.exists(readme_path):
+        with open(readme_path, encoding="utf-8") as f:
+            long_description = f.read()
+        break
+
+if not long_description:
+    long_description = "A CLI tool to fix mathematical equations in markdown files and convert between formats"
 
 # Get the version from the __init__.py file
 with open(os.path.join(here, "src/markdown_equations_fixer/__init__.py")) as f:

@@ -101,7 +101,7 @@ And a matrix:
 \]
 ```
 
-**Output:**
+**Output:**  May not format properly on github, but will work on markdown editor apps like obsidian, marktext, etc.
 ```markdown
 Here's an equation: $$E = mc^2$$
 

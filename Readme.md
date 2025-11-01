@@ -25,6 +25,9 @@ A command-line tool to standardize mathematical equations in Markdown files and 
 pip install markdown-equations-fixer
 ```
 
+> **Note:** For fixing equations in Markdown files, you _do not_ need to install Pandoc or LaTeX—only `pip install markdown-equations-fixer` is required.
+
+
 **For document conversion**, install [Pandoc](https://pandoc.org/installing.html):
 - Windows: `choco install pandoc`
 - macOS: `brew install pandoc`

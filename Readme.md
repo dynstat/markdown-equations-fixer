@@ -4,155 +4,129 @@
 [![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A versatile command-line tool to standardize and fix mathematical equations in Markdown files and convert documents between various formats like Markdown, LaTeX, DOCX, and PDF.
-
-## Table of Contents
-
-- [Key Features](#key-features)
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Command: `fix`](#command-fix)
-  - [Command: `convert`](#command-convert)
-- [Requirements](#requirements)
-  - [Python Packages](#python-packages)
-  - [System Dependencies](#system-dependencies)
-- [License](#license)
-- [Contributing](#contributing)
+A command-line tool to standardize mathematical equations in Markdown files and convert documents between formats (Markdown, LaTeX, DOCX, PDF).
 
 ## Key Features
 
-- **Fix Markdown Equations**: Standardizes common LaTeX-style equations to a consistent Markdown format.
-  - Converts block equations from `\[...\]` to the widely supported `$$...$$`.
-  - Converts inline equations from `\(...\)` to `$..$`.
-  - Handles both single-line and multi-line equations gracefully.
-- **Document Conversion**: Leverages Pandoc to convert files between a variety of formats, including:
-  - `markdown`, `gfm` (GitHub-Flavored Markdown), `commonmark`
-  - `latex`
-  - `org`
-  - `docx`
-  - `pdf`
-- **User-Friendly CLI**:
-  - Process multiple files or entire directories at once.
-  - `--recursive` flag to scan through subdirectories.
-  - `--dry-run` mode to preview changes without modifying files.
-  - Rich console output with progress bars and status indicators.
+- **Fix Markdown Equations**: Standardizes LaTeX-style equations to Markdown format
+  - `\[...\]` → `$$...$$` (block equations)
+  - `\(...\)` → `$...$` (inline equations)
+  - Multi-line equations supported
+- **Document Conversion**: Convert between formats using Pandoc
+  - Input: `markdown`, `gfm`, `commonmark`, `latex`, `org`, `docx`
+  - Output: `markdown`, `gfm`, `commonmark`, `latex`, `org`, `docx`, `pdf`
+- **CLI Features**: Recursive processing, dry-run mode, progress indicators
 
 ## Installation
 
-You can install the package directly from PyPI:
+**Prerequisites**: Python 3.7+
 
 ```bash
 pip install markdown-equations-fixer
 ```
 
-Or, to install the latest development version from GitHub:
+**For document conversion**, install [Pandoc](https://pandoc.org/installing.html):
+- Windows: `choco install pandoc`
+- macOS: `brew install pandoc`
+- Linux: `sudo apt-get install pandoc`
 
-```bash
-pip install git+https://github.com/dynstat/markdown-equations-fixer.git
-```
+**For PDF/DOCX output**, install a LaTeX distribution:
+- Windows: `choco install miktex`
+- macOS: `brew install --cask basictex`
+- Linux: `sudo apt-get install texlive-latex-extra`
 
 ## Usage
 
-The tool provides two main commands: `fix` and `convert`.
+### Fix Equations
 
-### Command: `fix`
+Standardize mathematical equations in Markdown files (`.md`, `.markdown`):
 
-Use the `fix` command to standardize mathematical equations within your Markdown files (`.md`, `.markdown`).
-
-**Syntax:**
 ```bash
-meq-fixer fix [OPTIONS] [PATHS]...
+# Fix a single file
+meq-fixer fix document.md
+
+# Fix multiple files/directories
+meq-fixer fix file1.md file2.md ./docs/
+
+# Recursively process a directory
+meq-fixer fix -r ./my-project/
+
+# Preview changes without modifying (dry run)
+meq-fixer fix --dry-run thesis.md
+
+# Verbose output
+meq-fixer fix -v document.md
 ```
 
-**Examples:**
-
-1.  **Fix a single file:**
-    ```bash
-    meq-fixer fix document.md
-    ```
-
-2.  **Fix multiple files and directories:**
-    ```bash
-    meq-fixer fix file1.md ./docs/
-    ```
-
-3.  **Recursively fix all markdown files in a directory:**
-    ```bash
-    meq-fixer fix -r ./my-project/
-    ```
-
-4.  **Preview changes without saving them (dry run):**
-    ```bash
-    meq-fixer fix --dry-run thesis.md
-    ```
-
 **Options:**
+- `--dry-run`: Preview without making changes
+- `--verbose`, `-v`: Show detailed progress
+- `--recursive`, `-r`: Process subdirectories
 
--   `--dry-run`: Preview changes without modifying files.
--   `--verbose`, `-v`: Show detailed, file-by-file progress.
--   `--recursive`, `-r`: Process directories recursively.
+### Convert Documents
 
-### Command: `convert`
+Convert between document formats:
 
-Use the `convert` command to translate documents between different formats.
-
-**Syntax:**
 ```bash
-meq-fixer convert [OPTIONS] <INPUT_FILE> <OUTPUT_FILE>
+# Markdown to DOCX
+meq-fixer convert paper.md paper.docx --to-format docx
+
+# LaTeX to GitHub Markdown
+meq-fixer convert report.tex report.md -f latex -t gfm
+
+# Convert and fix equations (Markdown output only)
+meq-fixer convert paper.tex paper.md -t markdown --fix-equations
+
+# Markdown to PDF
+meq-fixer convert thesis.md thesis.pdf -t pdf
 ```
 
-**Examples:**
-
-1.  **Convert Markdown to a DOCX document:**
-    ```bash
-    meq-fixer convert my-paper.md my-paper.docx --to-format docx
-    ```
-
-2.  **Convert a LaTeX file to GitHub-Flavored Markdown (GFM):**
-    ```bash
-    meq-fixer convert report.tex report.md --from-format latex --to-format gfm
-    ```
-
-3.  **Convert to Markdown and fix equations in one step:**
-    The `--fix-equations` flag applies the same logic as the `fix` command to the *output* file. This is only useful when converting *to* a Markdown format.
-    ```bash
-    meq-fixer convert paper.tex paper.md --to-format markdown --fix-equations
-    ```
-
 **Options:**
+- `--from-format`, `-f`: Input format (`markdown`, `gfm`, `commonmark`, `latex`, `org`, `docx`)
+- `--to-format`, `-t`: Output format (`markdown`, `gfm`, `commonmark`, `latex`, `pdf`, `docx`, `org`)
+- `--fix-equations`: Fix equations in Markdown output (Markdown formats only)
 
--   `--from-format`, `-f`: The input format (e.g., `latex`, `markdown`).
--   `--to-format`, `-t`: The output format (e.g., `docx`, `pdf`, `gfm`).
--   `--fix-equations`: Fix equations in the output file (for Markdown output formats only).
+## Examples
 
-## Requirements
+**Input:**
+```markdown
+Here's an equation: \[E = mc^2\]
 
-### Python Packages
+And a matrix:
+\[
+\begin{bmatrix}
+1 & 2 & 3 \\
+4 & 5 & 6
+\end{bmatrix}
+\]
+```
 
-The installer will handle these dependencies automatically.
+**Output:**
+```markdown
+Here's an equation: $$E = mc^2$$
 
--   `click>=8.0.0`
--   `rich>=10.0.0`
--   `pypandoc`
+And a matrix:
+$$
+\begin{bmatrix}
+1 & 2 & 3 \\
+4 & 5 & 6
+\end{bmatrix}
+$$
+```
 
-### System Dependencies
+## Dependencies
 
-For the `convert` command to function, especially for DOCX and PDF output, you must have the following software installed on your system:
+**Python packages** (installed automatically):
+- `click>=8.0.0`
+- `rich>=10.0.0`
+- `pypandoc`
 
-1.  **Pandoc**: A universal document converter.
-    -   **Windows (with Chocolatey)**: `choco install pandoc`
-    -   **macOS (with Homebrew)**: `brew install pandoc`
-    -   **Linux (Debian/Ubuntu)**: `sudo apt-get install pandoc`
-
-2.  **A LaTeX Distribution**: Required for rendering equations in PDF and DOCX files.
-    -   **Windows**: MiKTeX (`choco install miktex`)
-    -   **macOS**: MacTeX (`brew install --cask mactex` or `basictex`)
-    -   **Linux (Debian/Ubuntu)**: TeX Live (`sudo apt-get install texlive-latex-extra`)
+See [Installation](#installation) for system dependencies.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+MIT License. See [LICENSE](LICENSE) file.
 
 ## Contributing
 
-Issues and pull requests are welcome! Please feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/dynstat/markdown-equations-fixer/).
+Contributions welcome! Open an [issue](https://github.com/dynstat/markdown-equations-fixer/issues) or submit a [pull request](https://github.com/dynstat/markdown-equations-fixer/pulls).

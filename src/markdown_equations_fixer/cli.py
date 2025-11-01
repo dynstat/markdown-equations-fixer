@@ -8,6 +8,7 @@ from rich import print as rprint  # Rich-formatted print function
 from typing import Optional, List, Literal  # Type hinting utilities
 import logging  # Logging module for status and error reporting
 import pypandoc  # Pandoc wrapper for document format conversion
+import platform  # Platform detection for cross-platform compatibility
 
 from . import __version__
 
@@ -241,13 +242,22 @@ def convert(
 
             # Add specific arguments for PDF/DOCX output
             if to_fmt in ["pdf", "docx"]:
+                # Use appropriate system fonts for better cross-platform compatibility
+                system = platform.system()
+                if system == "Windows":
+                    mainfont = "Times New Roman"
+                elif system == "Darwin":  # macOS
+                    mainfont = "Times"
+                else:  # Linux
+                    mainfont = "TeX Gyre Termes"  # Modern Times clone, commonly available
+                
                 extra_args.extend(
                     [
                         "--standalone",
                         "--variable",
                         "geometry:margin=1in",
                         "--variable",
-                        "mainfont:Times New Roman",
+                        f"mainfont:{mainfont}",
                     ]
                 )
 
